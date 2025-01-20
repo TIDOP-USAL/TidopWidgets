@@ -21,15 +21,7 @@
 #                                                                        #
 ##########################################################################
 
-cmake_minimum_required(VERSION 3.10.0...3.22)
-
-if(${CMAKE_VERSION} VERSION_LESS 3.12)
-    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
-endif()
-
-if(POLICY CMP0146) 
-    cmake_policy(SET CMP0146 OLD) 
-endif()
+cmake_minimum_required(VERSION 3.14)
 
 project(TidopWidgets 
         VERSION 0.0.1
@@ -40,8 +32,6 @@ project(TidopWidgets
 message(STATUS "\n${PROJECT_NAME} ${TidopWidgets_VERSION}")
 message(STATUS ${TidopWidgets_DESCRIPTION})
 message(STATUS ${TidopWidgets_HOMEPAGE_URL})		
-
-
 
 
 # Configuration 
@@ -63,3 +53,25 @@ set(CMAKE_AUTOMOC ON)
 # Create code from a list of Qt designer ui files
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
+
+# Buscar Qt (asegúrate de tener Qt instalado)
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+
+# Añadir los archivos del widget
+set(WIDGET_SOURCES
+    src/TWidgets/TestWidget/TestWidget.cpp
+)
+
+set(WIDGET_HEADERS
+    src/TWidgets/TidopWidget.h
+    src/TWidgets/JPEGWidget/JPEGWidget
+)
+
+# Ejecutable principal
+add_executable(TestWidget main.cpp ${WIDGET_SOURCES} ${WIDGET_HEADERS})
+
+# Vincular bibliotecas de Qt
+target_link_libraries(TestWidget PRIVATE Qt5::Widgets)
+
+# Incluir directorios
+target_include_directories(TestWidget PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
