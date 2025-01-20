@@ -18,7 +18,7 @@ def parse_json(json_file):
     with open(json_file, "r", encoding="utf-8") as file:
         return json.load(file)
 
-def generate_widget(json_data):
+def generate_widget(json_data, library_name):
     """
     Genera los archivos .h y .cpp basados en la configuración JSON y las plantillas.
     """
@@ -49,7 +49,8 @@ def generate_widget(json_data):
             f"    mLabel{param['name'].capitalize()} = new QLabel(this);\n"
             f"    gridLayout->addWidget(mLabel{param['name'].capitalize()}, {index}, 0);\n"
             f"    m{param['name'].capitalize()} = new {param['qt_type']}(this);\n"
-            f"    gridLayout->addWidget(m{param['name'].capitalize()}, {index}, 1);"
+            f"    gridLayout->addWidget(m{param['name'].capitalize()}, {index}, 1);\n"
+            f"    m{param['name'].capitalize()}->setToolTip(QString::fromUtf8(\"{param['hint']}\"));"
             if param["qt_type"] not in {"QCheckBox", "QRadioButton"}
             else f"    m{param['name'].capitalize()} = new {param['qt_type']}(this);\n"
             f"    gridLayout->addWidget(m{param['name'].capitalize()}, {index}, 0, 1, 2);"
@@ -62,23 +63,23 @@ def generate_widget(json_data):
             values = param.get("values", [])
             if values:
                 # Añadir opciones al QComboBox
-                combo_values = "\n".join(
+                combo_values = "\n    ".join(
                     [f'm{param["name"].capitalize()}->addItem("{value}");' for value in values]
                 )
-                init_ui += f"\n{combo_values}"
+                init_ui += f"\n    {combo_values}"
             # Configuración de valor predeterminado
             if param.get("def_value"):
-                init_ui += f'\nm{param["name"].capitalize()}->setCurrentText("{param["def_value"]}");'
+                init_ui += f'\n    m{param["name"].capitalize()}->setCurrentText("{param["def_value"]}");'
         
         # Manejo para QSpinBox y QDoubleSpinBox
         elif param["qt_type"] in {"QSpinBox", "QDoubleSpinBox"}:
             if "min_value" in param:
-                init_ui += f'\nm{param["name"].capitalize()}->setMinimum({param["min_value"]});'
+                init_ui += f'\n    m{param["name"].capitalize()}->setMinimum({param["min_value"]});'
             if "max_value" in param:
-                init_ui += f'\nm{param["name"].capitalize()}->setMaximum({param["max_value"]});'
+                init_ui += f'\n    m{param["name"].capitalize()}->setMaximum({param["max_value"]});'
             # Configuración de valor predeterminado
             if param.get("def_value"):
-                init_ui += f'\nm{param["name"].capitalize()}->setValue({param["def_value"]});'
+                init_ui += f'\n    m{param["name"].capitalize()}->setValue({param["def_value"]});'
             
     connect_signals_and_slots = "\n".join(
         [
@@ -178,7 +179,7 @@ def generate_widget(json_data):
     )
     cpp_content = cpp_template.format(
         Name=widget_name,
-        ComponentName=widget_name,
+        LibraryName=library_name,
         includes="\n".join(f"#include <{cls}>" for cls in sorted(include_headers)),
         init_ui=init_ui,
         connect_signals_and_slots=connect_signals_and_slots,
@@ -189,9 +190,11 @@ def generate_widget(json_data):
     )
 
     # Crear la carpeta de salida
-    os.makedirs("output", exist_ok=True)
-    header_path = os.path.join("output", f"{widget_name}Widget.h")
-    cpp_path = os.path.join("output", f"{widget_name}Widget.cpp")
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    base_output_dir = os.path.join(base_dir, "src", "TWidgets", library_name)
+    os.makedirs(base_output_dir, exist_ok=True)
+    header_path = os.path.join(base_output_dir, f"{widget_name}Widget.h")
+    cpp_path = os.path.join(base_output_dir, f"{widget_name}Widget.cpp")
 
     # Escribir los archivos generados
     with open(header_path, "w", encoding="utf-8") as header_file:
@@ -203,15 +206,21 @@ def generate_widget(json_data):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Generador de widgets basados en JSON y plantillas"
+        description="Generate a widget from JSON definition."
     )
     parser.add_argument(
         "config_file",
         type=str,
-        help="Ruta al archivo JSON con la configuración del widget"
+        help="Path to the JSON file defining the widget."
+    )
+    parser.add_argument(
+        "--library",
+        required=True, 
+        type=str,
+        help="Name of the library to add the widget to."
     )
     args = parser.parse_args()
 
     # Leer configuración y generar widgets
     json_data = parse_json(args.config_file)
-    generate_widget(json_data)
+    generate_widget(json_data, args.library)

@@ -1,4 +1,4 @@
-#include "TWidgets/{Name}Widget/{Name}Widget.h"
+#include "TWidgets/{LibraryName}/{Name}Widget.h"
 
 #include <QApplication>
 #include <QGridLayout>
@@ -19,7 +19,7 @@ namespace TWidget
 
 void {Name}Widget::initUI()
 {{
-    setObjectName(QString("{ComponentName}Widget"));
+    setObjectName(QString("{Name}Widget"));
     resize(380, 250);
 
     QGridLayout *gridLayout = new QGridLayout();

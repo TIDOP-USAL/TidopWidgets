@@ -57,21 +57,13 @@ set(CMAKE_AUTORCC ON)
 # Buscar Qt (asegúrate de tener Qt instalado)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
-# Añadir los archivos del widget
-set(WIDGET_SOURCES
-    src/TWidgets/TestWidget/TestWidget.cpp
-)
-
-set(WIDGET_HEADERS
-    src/TWidgets/TidopWidget.h
-    src/TWidgets/JPEGWidget/JPEGWidget
-)
+add_subdirectory(src)
 
 # Ejecutable principal
-add_executable(TestWidget main.cpp ${WIDGET_SOURCES} ${WIDGET_HEADERS})
+add_executable(TestWidget main.cpp src/TWidgets/TidopWidget.h)
 
 # Vincular bibliotecas de Qt
-target_link_libraries(TestWidget PRIVATE Qt5::Widgets)
+target_link_libraries(TestWidget PRIVATE Qt5::Widgets TWidgets::RasterFilters)
 
 # Incluir directorios
 target_include_directories(TestWidget PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
