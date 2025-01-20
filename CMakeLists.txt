@@ -1,0 +1,65 @@
+##########################################################################
+#                                                                        #
+# Copyright 2024 by Tidop Research Group <daguilera@usal.es>             #
+#                                                                        #
+# This file is part of TidopWidgets                                      #
+#                                                                        #
+# TidopWidgets is free software: you can redistribute it and/or modify   #
+# it under the terms of the GNU General Public License as published by   #
+# the Free Software Foundation, either version 3 of the License, or (at  #
+# your option) any later version.                                        #
+#                                                                        #
+# TidopWidgets is distributed in the hope that it will be useful, but    #
+# WITHOUT ANY WARRANTY; without even the implied warranty of             #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.                   #
+# See the GNU General Public License for more details.                   #
+#                                                                        #
+# You should have received a copy of the GNU General Public License      #
+# along with TidopWidgets.  If not, see <http://www.gnu.org/licenses/>.  #
+#                                                                        #
+# https://spdx.org/licenses/GPL-3.0-or-later.html                        #
+#                                                                        #
+##########################################################################
+
+cmake_minimum_required(VERSION 3.10.0...3.22)
+
+if(${CMAKE_VERSION} VERSION_LESS 3.12)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+endif()
+
+if(POLICY CMP0146) 
+    cmake_policy(SET CMP0146 OLD) 
+endif()
+
+project(TidopWidgets 
+        VERSION 0.0.1
+        DESCRIPTION "Tidop Widgets"
+        HOMEPAGE_URL "http://tidop.usal.es"
+        LANGUAGES CXX)
+		
+message(STATUS "\n${PROJECT_NAME} ${TidopWidgets_VERSION}")
+message(STATUS ${TidopWidgets_DESCRIPTION})
+message(STATUS ${TidopWidgets_HOMEPAGE_URL})		
+
+
+
+
+# Configuration 
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+set(CMAKE_DEBUG_POSTFIX d)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG")
+set(CMAKE_CONFIGURATION_TYPES Release;Debug)
+
+# Find includes in corresponding build directories
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# Instruct CMake to run moc automatically when needed
+set(CMAKE_AUTOMOC ON)
+# Create code from a list of Qt designer ui files
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
